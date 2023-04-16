@@ -563,8 +563,8 @@ combined_union_col.to_csv("./SmarinoiRun1/SmarinoiUnion_curated.csv")
 # In[544]:
 
 
-input_dir = "/Users/mahnoorzulfiqar/OneDriveUNI/MAW-Diatom/SmarinoiRun1"
-input_csv = "/Users/mahnoorzulfiqar/OneDriveUNI/MAW-Diatom/SmarinoiRun1/SmarinoiUnion_curated.csv"
+input_dir = "./SmarinoiRun1"
+input_csv = "./SmarinoiRun1/SmarinoiUnion_curated.csv"
 naming = "union"
 
 
@@ -574,8 +574,88 @@ naming = "union"
 sunburst(input_dir, input_csv, naming)
 
 
+# In[607]:
+
+
+def chemMN(input_dir, input_csv, naming, name_col):
+    df = pd.read_csv(input_csv)
+    dbn= []
+    for i, row in df.iterrows():
+        for j, row in df.iterrows():
+            if df['SMILES'][i] != df['SMILES'][j]:
+                try:
+                    ms = [Chem.MolFromSmiles(df['SMILES'][i]), Chem.MolFromSmiles(df['SMILES'][j])]
+                    fps = [AllChem.GetMorganFingerprintAsBitVect(x,2, nBits=1024) for x in ms]
+                    tn = DataStructs.FingerprintSimilarity(fps[0],fps[1])
+                    dbn.append({
+                        'Namei':df[name_col][i],
+                        'Namej':df[name_col][j],
+                        'i': df['SMILES'][i],
+                        'j': df['SMILES'][j],
+                        'Tanimoto': tn
+                    })
+                except:
+                    pass
+        #print(i)
+    db_edge = pd.DataFrame(dbn)
+    db_edge.to_csv(input_dir+ "/"+ naming+ "_allVSall.csv")
+
+    dfe = []
+    x=0
+    for i, row in db_edge.iterrows():        
+        if db_edge['Tanimoto'][i] >= 0.85:
+            x=x+1
+            dfe.append({
+                'Start':db_edge['Namei'][i],
+                'End':db_edge['Namej'][i],
+                'Tanimoto':db_edge['Tanimoto'][i]
+            })
+    new_df = pd.DataFrame(dfe)
+    new_df['Start'] = new_df['Start'].astype(str)
+    new_df['End'] = new_df['End'].astype(str)
+    new_df['StartAtt']=np.nan
+    new_df['EndAtt']=np.nan
+    for i, row in new_df.iterrows():
+        for j, row in df.iterrows():
+            if new_df['Start'][i]==df[name_col][j]:
+                new_df.loc[i, 'StartAtt'] = df['superclass'][j]
+    for i, row in new_df.iterrows():
+        for j, row in df.iterrows():
+            if new_df['End'][i]==df[name_col][j]:
+                new_df.loc[i, 'EndAtt'] = df['superclass'][j]
+
+    new_df['sorted_names'] = new_df.apply(lambda row: '-'.join(sorted([row['Start'], row['End']])), axis=1)
+    new_df = new_df.drop_duplicates(subset=["sorted_names"], keep="last")
+    new_df.to_csv(input_dir + "/" + naming + "_chemMN_Cytoscape.tsv", sep='\t')
+    return new_df
+
+
+# In[599]:
+
+
+chemMN(
+       input_dir = "/Users/mahnoorzulfiqar/OneDriveUNI/MAW-Diatom/SmarinoiRun1",
+        input_csv = "/Users/mahnoorzulfiqar/OneDriveUNI/MAW-Diatom/SmarinoiRun1/SmarinoiUnion_curated.csv",
+       naming = "union",
+      name_col = "Name")
+
+
 # In[ ]:
 
 
+chemMN(
+       input_dir = "./SmarinoiRun1",
+        input_csv = "./SmarinoiRun1/SmarinoiUnion_curated.csv",
+       naming = "union",
+      name_col = "Name")
 
+
+# In[ ]:
+
+
+chemMN(
+       input_dir = "./suspectlist",
+        input_csv = "./suspectlist/unique_final_suspectlist.csv",
+       naming = "union",
+      name_col = "Name")
 
