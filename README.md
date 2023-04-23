@@ -1,4 +1,4 @@
-# MAW-Diatom
+# Metabolic profiling of _Skeletonema marinoi_ using MAW
 
 Metabolome Annotation Workflow (MAW) [1] was used to perform metaboli profiling of Skeletonema marinoi using the spectral data from Liquid Chromtohtaphy Tandem Mass Spectrometry (LCMS2). The data of the RAW and mzML files is submitted to MetaboLights with the accession number: [MTBLS2892](www.ebi.ac.uk/metabolights/MTBLS2892) 
 
