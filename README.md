@@ -10,3 +10,6 @@ MAW-Py used Workflow_Python_Script_all.py to perform the candidate selection fro
 
 # Suspect List
 The suspect list curation was performed using the suspectlits_curation.py. The comments in the script provide detail on all steps involved in the curation process and can be applicable to other suspect lists or any list with SMILES.
+
+## Citation
+[1] Zulfiqar, M., Gadelha, L., Steinbeck, C. et al. MAW: the reproducible Metabolome Annotation Workflow for untargeted tandem mass spectrometry. J Cheminform 15, 32 (2023). https://doi.org/10.1186/s13321-023-00695-y
